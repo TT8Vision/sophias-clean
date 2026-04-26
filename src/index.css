@@ -1,0 +1,157 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─────────────────────────────────────────────────────────────
+   CSS Custom Properties — Sophia's Clean Design Tokens
+   Pink × White premium palette
+   ───────────────────────────────────────────────────────────── */
+:root {
+  /* ── Primary pink scale (replaces sage) ── */
+  --color-sage:        #c2185b;   /* deep rose — primary brand pink    */
+  --color-sage-dark:   #880e4f;   /* burgundy rose — dark hover states */
+  --color-sage-light:  #f8bbd0;   /* blush — light tint backgrounds    */
+
+  /* ── Background scale (replaces cream — now white-forward) ── */
+  --color-cream:       #ffffff;   /* pure white — page background      */
+  --color-cream-warm:  #fdf0f7;   /* barely-pink warm white            */
+  --color-cream-border:#fce4ec;   /* soft pink border                  */
+
+  /* ── Dark text (near-black with pink undertone) ── */
+  --color-charcoal:    #1a0812;
+  --color-charcoal-800:#200d16;
+
+  /* ── Rose-gold accent (replaces gold) ── */
+  --color-gold:        #d4647a;   /* rose gold — accent pops           */
+  --color-gold-light:  #f4a0b5;   /* light rose gold                   */
+
+  /* Typography */
+  --font-sans:    'Inter', system-ui, sans-serif;
+  --font-display: 'Playfair Display', Georgia, serif;
+
+  /* Spacing scale */
+  --section-padding: clamp(5rem, 10vw, 9rem);
+
+  /* Transitions */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring:   cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ─── Base ─────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: auto; }
+
+/* ─── Premium image rendering ─────────────────────────────────
+   Force browsers to use the highest-quality resampler when scaling
+   images down (most cases on retina displays).
+   ───────────────────────────────────────────────────────────── */
+img {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  image-rendering: high-quality;
+  -ms-interpolation-mode: bicubic;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--color-cream);
+  color: var(--color-charcoal);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root { min-height: 100vh; }
+
+/* ─── Custom cursor ─────────────────────────────────────────── */
+@media (hover: hover) { body { cursor: none; } }
+
+/* ─── Selection ─────────────────────────────────────────────── */
+::selection {
+  background: var(--color-sage-light);
+  color: var(--color-charcoal);
+}
+
+/* ─── Scrollbar ─────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--color-cream); }
+::-webkit-scrollbar-thumb { background: var(--color-sage-light); border-radius: 3px; }
+
+/* ─── Gradient text — rose to blush ───────────────────────── */
+.gradient-text {
+  background: linear-gradient(135deg, var(--color-sage-dark) 0%, var(--color-gold) 60%, var(--color-sage-light) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─── Grid dots decoration ──────────────────────────────────── */
+.grid-dots {
+  background-image: radial-gradient(var(--color-cream-border) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+/* ─── Animated border ───────────────────────────────────────── */
+@property --border-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+@keyframes border-rotate {
+  to { --border-angle: 360deg; }
+}
+.animated-border {
+  border: 1.5px solid transparent;
+  background:
+    linear-gradient(var(--color-cream), var(--color-cream)) padding-box,
+    conic-gradient(
+      from var(--border-angle),
+      var(--color-sage-light) 0deg,
+      var(--color-gold-light) 90deg,
+      var(--color-sage-light) 180deg,
+      var(--color-gold-light) 270deg,
+      var(--color-sage-light) 360deg
+    ) border-box;
+  animation: border-rotate 6s linear infinite;
+}
+
+/* ─── Float animation for particles ────────────────────────── */
+@keyframes float-up {
+  0%   { transform: translateY(0) scale(1);   opacity: 0; }
+  10%  { opacity: 0.6; }
+  90%  { opacity: 0.2; }
+  100% { transform: translateY(-110vh) scale(0.4); opacity: 0; }
+}
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: float-up linear infinite;
+}
+
+/* ─── Marquee ───────────────────────────────────────────────── */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.marquee-track {
+  animation: marquee 28s linear infinite;
+  will-change: transform;
+}
+.marquee-track:hover { animation-play-state: paused; }
+
+/* ─── Shimmer loading ───────────────────────────────────────── */
+@keyframes shimmer {
+  from { background-position: -200% 0; }
+  to   { background-position: 200% 0; }
+}
+
+/* ─── Text reveal clip ──────────────────────────────────────── */
+.reveal-clip {
+  clip-path: inset(0 100% 0 0);
+  animation: reveal-clip 1s var(--ease-out-expo) forwards;
+}
+@keyframes reveal-clip {
+  to { clip-path: inset(0 0% 0 0); }
+}
