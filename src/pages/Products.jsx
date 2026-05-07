@@ -1,15 +1,31 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Leaf, Search, MessageCircle } from 'lucide-react';
+import { ArrowRight, Leaf, Search, MessageCircle, Plus, Check, Sparkles, ShoppingBag } from 'lucide-react';
 import MagneticButton from '../components/MagneticButton';
 import { staggerContainer, staggerItem } from '../animations/variants';
-import { useScrollReveal } from '../hooks/useScrollReveal';
+import { useCart } from '../lib/CartContext';
 
 // ─── Real product catalogue from sophiasclean.co.za/products ────
 // Astonish — plant-based, cruelty-free, no harmful chemicals
+// Featured promo bundle — rendered as a hero banner above the grid
+const BUNDLE = {
+  name: 'Astonish Cleaning Bundle',
+  price: '300.00',
+  originalPrice: '317.40',
+  image: '/products/00-astonish-bundle.jpg',
+  category: 'Bundle',
+  includes: [
+    'Window & Glass Cleaner',
+    'Toilet Fresh Peony',
+    'Kitchen Cleaner Zesty Lemon',
+    'Floor Cleaner Peony Bloom',
+    'Antibacterial Surface Cleanser',
+    'Bathroom Cleaner',
+  ],
+  saving: '17.40',
+};
+
 const PRODUCTS = [
-  { name: 'Astonish Starter Cleaning Bundle',                                  price: '300.00', image: '/products/01-astonish-starter-cleaning-bundle.jpg',                          category: 'Bundle'      },
-  { name: 'Astonish Pet Fresh Stain Remover 750ml',                            price: '52.90',  image: '/products/02-astonish-pet-fresh-stain-remover-750ml.jpg',                    category: 'Everyday'    },
   { name: 'Astonish Multi-Purpose Bicarbonate of Soda 750ml',                  price: '52.90',  image: '/products/03-astonish-multi-purpose-bicarbonate-of-soda-750ml.jpg',          category: 'Everyday'    },
   { name: 'Astonish Fabric Refresher Cotton Fresh 750ml',                      price: '52.90',  image: '/products/04-astonish-fabric-refresher-cotton-fresh-750ml.jpg',              category: 'Everyday'    },
   { name: 'Astonish Oxy Active Fabric Stain Remover 750ml',                    price: '52.90',  image: '/products/05-astonish-oxy-active-fabric-stain-remover-750ml.jpg',            category: 'Everyday'    },
@@ -18,7 +34,6 @@ const PRODUCTS = [
   { name: 'Astonish Multi-Surface Cleaner Orange Grove 750ml',                 price: '52.90',  image: '/products/08-astonish-multi-surface-cleaner-orange-grove-750ml.jpg',         category: 'Everyday'    },
   { name: 'Astonish Bathroom Cleaner White Jasmine & Basil 750ml',             price: '52.90',  image: '/products/09-astonish-bathroom-cleaner-white-jasmine-basil-750m.jpg',        category: 'Everyday'    },
   { name: 'Astonish Floor Cleaner Zesty Lemon 1L',                             price: '52.90',  image: '/products/10-astonish-floor-cleaner-zesty-lemon1-lt.jpg',                    category: 'Floor'       },
-  { name: 'Astonish Pet Fresh Floor Cleaner 1L',                               price: '52.90',  image: '/products/11-astonish-pet-fresh-floor-cleaner-1-lt.jpg',                     category: 'Floor'       },
   { name: 'Astonish Floor Cleaner Peony Bloom 1L',                             price: '52.90',  image: '/products/12-astonish-floor-cleaner-peony-bloom-1-lt.jpg',                   category: 'Floor'       },
   { name: 'Astonish Floor Cleaner Lavender Blossom 1L',                        price: '52.90',  image: '/products/13-astonish-floor-cleaner-lavender-blossom-1-lt.jpg',              category: 'Floor'       },
   { name: 'Astonish Toilet Fresh Ocean',                                       price: '52.90',  image: '/products/14-astonish-toilet-fresh-ocean.jpg',                               category: 'Toilet'      },
@@ -40,12 +55,12 @@ const PRODUCTS = [
   { name: 'Astonish Specialist Extra Strength Grease Lifter 750ml',            price: '52.90',  image: '/products/30-astonish-specialist-extra-strength-grease-lifter-7.jpg',         category: 'Specialist'  },
 ];
 
-const CATEGORIES = ['All', 'Bundle', 'Everyday', 'Floor', 'Toilet', 'Carpet', 'Specialist', 'Dishwasher'];
+const CATEGORIES = ['All', 'Everyday', 'Floor', 'Toilet', 'Carpet', 'Specialist', 'Dishwasher'];
 
 export default function Products() {
   const [filter, setFilter] = useState('All');
   const [search, setSearch] = useState('');
-  const { ref: gridRef, isInView: gridVisible } = useScrollReveal();
+  const { addItem } = useCart();
 
   const filtered = useMemo(() => {
     return PRODUCTS.filter((p) => {
@@ -54,11 +69,6 @@ export default function Products() {
       return matchCat && matchSearch;
     });
   }, [filter, search]);
-
-  const enquireWhatsApp = (productName) => {
-    const text = encodeURIComponent(`Hi Sophia's Clean, I'd like to enquire about: ${productName}`);
-    window.open(`https://wa.me/27833999974?text=${text}`, '_blank');
-  };
 
   return (
     <div className="pt-24 pb-20 min-h-screen" style={{ background: 'var(--color-cream-warm)' }}>
@@ -89,6 +99,9 @@ export default function Products() {
             The same eco-conscious products our team uses on every job. Plant-based, cruelty-free, and made without harmful chemicals.
           </p>
         </motion.div>
+
+        {/* ── Promo Bundle Banner ── */}
+        <PromoBundleBanner bundle={BUNDLE} onAdd={() => addItem(BUNDLE)} />
 
         {/* ── Filters + Search ── */}
         <motion.div
@@ -145,15 +158,18 @@ export default function Products() {
 
         {/* ── Product grid ── */}
         <motion.div
-          ref={gridRef}
           className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5"
           variants={staggerContainer}
           initial="hidden"
-          animate={gridVisible ? 'visible' : 'hidden'}
+          animate="visible"
         >
           <AnimatePresence mode="popLayout">
             {filtered.map((p) => (
-              <ProductCard key={p.name} product={p} onEnquire={() => enquireWhatsApp(p.name)} />
+              <ProductCard
+                key={p.name}
+                product={p}
+                onAdd={() => addItem(p)}
+              />
             ))}
           </AnimatePresence>
         </motion.div>
@@ -215,8 +231,27 @@ export default function Products() {
   );
 }
 
-function ProductCard({ product, onEnquire }) {
+function ProductCard({ product, onAdd }) {
   const [hovered, setHovered] = useState(false);
+  const [added, setAdded] = useState(false);
+
+  useEffect(() => {
+    if (!added) return;
+    const t = setTimeout(() => setAdded(false), 1200);
+    return () => clearTimeout(t);
+  }, [added]);
+
+  const handleAdd = (e) => {
+    e.stopPropagation();
+    onAdd();
+    setAdded(true);
+  };
+
+  const isPromo = !!product.promo;
+  const hasOriginalPrice = product.originalPrice && product.originalPrice !== product.price;
+  const savePercent = hasOriginalPrice
+    ? Math.round((1 - parseFloat(product.price) / parseFloat(product.originalPrice)) * 100)
+    : 0;
 
   return (
     <motion.div
@@ -226,11 +261,13 @@ function ProductCard({ product, onEnquire }) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95 }}
       transition={{ type: 'spring', stiffness: 200, damping: 22 }}
-      className="rounded-2xl overflow-hidden cursor-pointer group"
+      className="rounded-2xl overflow-hidden group flex flex-col"
       style={{
         background: 'white',
-        border: '1px solid var(--color-cream-border)',
-        boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
+        border: isPromo ? '1.5px solid rgba(212,100,122,0.5)' : '1px solid var(--color-cream-border)',
+        boxShadow: isPromo
+          ? '0 6px 24px rgba(212,100,122,0.18)'
+          : '0 2px 12px rgba(0,0,0,0.04)',
       }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -256,38 +293,286 @@ function ProductCard({ product, onEnquire }) {
         />
         <div
           className="absolute top-2.5 left-2.5 text-[9px] font-bold tracking-wider uppercase px-2 py-1 rounded-full"
-          style={{ background: 'rgba(194,24,91,0.88)', color: 'white' }}
+          style={{
+            background: isPromo
+              ? 'linear-gradient(135deg, var(--color-gold) 0%, var(--color-sage) 100%)'
+              : 'rgba(194,24,91,0.88)',
+            color: 'white',
+            boxShadow: isPromo ? '0 4px 14px rgba(212,100,122,0.35)' : 'none',
+          }}
         >
-          {product.category}
+          {isPromo ? 'Promo · Bundle' : product.category}
         </div>
+        {hasOriginalPrice && (
+          <div
+            className="absolute top-2.5 right-2.5 text-[10px] font-extrabold tracking-wide px-2 py-1 rounded-full"
+            style={{
+              background: 'white',
+              color: 'var(--color-sage)',
+              border: '1px solid rgba(194,24,91,0.25)',
+            }}
+          >
+            Save {savePercent}%
+          </div>
+        )}
       </div>
 
       {/* Info */}
-      <div className="p-4">
+      <div className="p-4 flex flex-col flex-1">
         <p
           className="font-medium text-xs leading-snug mb-2 line-clamp-2"
           style={{ color: 'var(--color-charcoal)', minHeight: '2.4em' }}
         >
           {product.name}
         </p>
-        <div className="flex items-center justify-between gap-2">
-          <p className="font-display font-bold text-base" style={{ color: 'var(--color-sage)' }}>
-            R{product.price}
-          </p>
-          <button
-            onClick={(e) => { e.stopPropagation(); onEnquire(); }}
-            className="text-[10px] font-bold tracking-wide uppercase px-3 py-1.5 rounded-full"
+
+        <div className="mt-auto flex items-center justify-between gap-2">
+          <div className="flex items-baseline gap-2">
+            <p className="font-display font-bold text-base" style={{ color: 'var(--color-sage)' }}>
+              R{product.price}
+            </p>
+            {hasOriginalPrice && (
+              <p
+                className="text-xs font-medium"
+                style={{
+                  color: 'rgba(26,8,18,0.4)',
+                  textDecoration: 'line-through',
+                }}
+              >
+                R{product.originalPrice}
+              </p>
+            )}
+          </div>
+
+          <motion.button
+            onClick={handleAdd}
+            disabled={added}
+            className="inline-flex items-center gap-1.5 text-[10px] font-bold tracking-wide uppercase px-3 py-1.5 rounded-full"
             style={{
-              background: 'rgba(194,24,91,0.08)',
-              color: 'var(--color-sage)',
+              background: added ? 'var(--color-sage)' : 'rgba(194,24,91,0.08)',
+              color: added ? 'white' : 'var(--color-sage)',
               border: 'none',
-              cursor: 'pointer',
+              cursor: added ? 'default' : 'pointer',
+              transition: 'background 0.25s, color 0.25s',
             }}
+            whileHover={!added ? { background: 'var(--color-sage)', color: 'white' } : {}}
+            whileTap={!added ? { scale: 0.94 } : {}}
+            aria-label={added ? `${product.name} added to cart` : `Add ${product.name} to cart`}
           >
-            Enquire
-          </button>
+            <AnimatePresence mode="wait" initial={false}>
+              {added ? (
+                <motion.span
+                  key="added"
+                  initial={{ opacity: 0, y: 4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -4 }}
+                  transition={{ duration: 0.18 }}
+                  className="inline-flex items-center gap-1.5"
+                >
+                  <Check size={11} /> Added
+                </motion.span>
+              ) : (
+                <motion.span
+                  key="add"
+                  initial={{ opacity: 0, y: 4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -4 }}
+                  transition={{ duration: 0.18 }}
+                  className="inline-flex items-center gap-1.5"
+                >
+                  <Plus size={11} /> Add to Cart
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </motion.button>
         </div>
       </div>
     </motion.div>
+  );
+}
+
+// ──────────────────────────────────────────────────────────────
+// Promo bundle banner — featured CTA above the product grid
+// ──────────────────────────────────────────────────────────────
+function PromoBundleBanner({ bundle, onAdd }) {
+  const [added, setAdded] = useState(false);
+
+  useEffect(() => {
+    if (!added) return;
+    const t = setTimeout(() => setAdded(false), 1400);
+    return () => clearTimeout(t);
+  }, [added]);
+
+  const handleAdd = () => {
+    onAdd();
+    setAdded(true);
+  };
+
+  const savePercent = Math.round(
+    (1 - parseFloat(bundle.price) / parseFloat(bundle.originalPrice)) * 100,
+  );
+
+  return (
+    <motion.section
+      className="relative rounded-3xl overflow-hidden mb-10"
+      style={{
+        background:
+          'linear-gradient(135deg, var(--color-sage) 0%, var(--color-sage-dark) 100%)',
+        boxShadow: '0 20px 60px rgba(194,24,91,0.28)',
+      }}
+      initial={{ opacity: 0, y: 24 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.05, type: 'spring', stiffness: 80, damping: 18 }}
+      aria-label="Featured promo bundle"
+    >
+      {/* Decorative wash */}
+      <div
+        className="absolute -top-32 -right-32 w-[480px] h-[480px] rounded-full pointer-events-none"
+        style={{
+          background:
+            'radial-gradient(circle, rgba(255,255,255,0.18) 0%, transparent 70%)',
+          filter: 'blur(20px)',
+        }}
+      />
+      <div
+        className="absolute -bottom-24 -left-24 w-[300px] h-[300px] rounded-full pointer-events-none"
+        style={{
+          background:
+            'radial-gradient(circle, rgba(244,160,181,0.35) 0%, transparent 70%)',
+          filter: 'blur(20px)',
+        }}
+      />
+
+      <div className="relative grid md:grid-cols-[minmax(0,0.85fr)_minmax(0,1fr)] gap-6 md:gap-10 items-center p-6 sm:p-8 md:p-10">
+        {/* Left — bundle image */}
+        <motion.div
+          className="relative rounded-2xl overflow-hidden mx-auto w-full max-w-sm md:max-w-none"
+          initial={{ opacity: 0, scale: 0.96 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.15, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          style={{
+            background: 'rgba(255,255,255,0.08)',
+            border: '1px solid rgba(255,255,255,0.18)',
+          }}
+        >
+          <img
+            src={bundle.image}
+            alt={bundle.name}
+            className="w-full h-full object-contain"
+            style={{ display: 'block', maxHeight: 460 }}
+            loading="eager"
+          />
+          <div
+            className="absolute top-3 left-3 inline-flex items-center gap-1.5 text-[10px] font-extrabold tracking-[0.18em] uppercase px-2.5 py-1.5 rounded-full"
+            style={{
+              background:
+                'linear-gradient(135deg, var(--color-gold) 0%, var(--color-gold-light) 100%)',
+              color: 'var(--color-charcoal)',
+              boxShadow: '0 4px 14px rgba(0,0,0,0.18)',
+            }}
+          >
+            <Sparkles size={11} />
+            Promo · Bundle
+          </div>
+          <div
+            className="absolute top-3 right-3 inline-flex items-center text-[11px] font-extrabold tracking-wide px-2.5 py-1.5 rounded-full"
+            style={{
+              background: 'white',
+              color: 'var(--color-sage-dark)',
+            }}
+          >
+            Save {savePercent}%
+          </div>
+        </motion.div>
+
+        {/* Right — copy + CTA */}
+        <div className="text-white">
+          <p className="text-[11px] font-bold tracking-[0.22em] uppercase text-white/70 mb-3">
+            Featured Promo
+          </p>
+          <h2
+            className="font-display font-bold leading-[1.05] mb-3 text-white"
+            style={{ fontSize: 'clamp(1.7rem, 3.4vw, 2.6rem)' }}
+          >
+            {bundle.name}
+          </h2>
+          <p
+            className="text-sm sm:text-base leading-relaxed mb-5"
+            style={{ color: 'rgba(255,255,255,0.85)' }}
+          >
+            Six Astonish bestsellers — everything you need to keep your home spotless. Save R{bundle.saving} when you grab the bundle.
+          </p>
+
+          {/* What's included */}
+          <ul className="grid grid-cols-2 gap-x-4 gap-y-1.5 mb-7">
+            {bundle.includes.map((item) => (
+              <li
+                key={item}
+                className="flex items-center gap-2 text-xs sm:text-sm"
+                style={{ color: 'rgba(255,255,255,0.85)' }}
+              >
+                <Check size={12} style={{ color: 'var(--color-gold-light)', flexShrink: 0 }} />
+                {item}
+              </li>
+            ))}
+          </ul>
+
+          {/* Pricing + CTA */}
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-4">
+            <div className="flex items-baseline gap-3">
+              <span
+                className="font-display font-extrabold text-white"
+                style={{ fontSize: 'clamp(2rem, 4vw, 2.8rem)', lineHeight: 1 }}
+              >
+                R{bundle.price}
+              </span>
+              <span
+                className="font-medium text-base"
+                style={{ color: 'rgba(255,255,255,0.55)', textDecoration: 'line-through' }}
+              >
+                R{bundle.originalPrice}
+              </span>
+            </div>
+
+            <MagneticButton
+              onClick={handleAdd}
+              className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-2xl font-bold text-sm"
+              style={{
+                background: added ? 'var(--color-charcoal)' : 'white',
+                color: added ? 'white' : 'var(--color-sage)',
+                boxShadow: '0 8px 24px rgba(0,0,0,0.22)',
+                transition: 'background 0.25s, color 0.25s',
+              }}
+            >
+              <AnimatePresence mode="wait" initial={false}>
+                {added ? (
+                  <motion.span
+                    key="added"
+                    initial={{ opacity: 0, y: 4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -4 }}
+                    transition={{ duration: 0.18 }}
+                    className="inline-flex items-center gap-2"
+                  >
+                    <Check size={15} /> Added to cart
+                  </motion.span>
+                ) : (
+                  <motion.span
+                    key="add"
+                    initial={{ opacity: 0, y: 4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -4 }}
+                    transition={{ duration: 0.18 }}
+                    className="inline-flex items-center gap-2"
+                  >
+                    <ShoppingBag size={15} /> Add Bundle to Cart <ArrowRight size={14} />
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </MagneticButton>
+          </div>
+        </div>
+      </div>
+    </motion.section>
   );
 }

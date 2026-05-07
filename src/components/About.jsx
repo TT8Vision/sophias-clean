@@ -11,11 +11,11 @@ const PILLARS = [
   { icon: Clock,        label: 'Punctual & Reliable', desc: 'We arrive on time, every time. SMS reminders before each visit.' },
 ];
 
-const STATS = [
-  { number: '500+', label: 'Happy Clients' },
-  { number: '8+',   label: 'Years Experience' },
-  { number: '98%',  label: 'Satisfaction Rate' },
-  { number: '0',    label: 'Toxic Chemicals' },
+const VALUES = [
+  { number: 'Cape Town', label: 'Where we serve'    },
+  { number: 'Owner-led', label: 'How we operate'    },
+  { number: 'Eco-First', label: 'Products we use'   },
+  { number: 'Vetted',    label: 'Every team member' },
 ];
 
 // ─────────────────────────────────────────────────────────────
@@ -36,7 +36,7 @@ export default function About() {
     <section
       id="about"
       ref={sectionRef}
-      className="section px-6 md:px-10 lg:px-16 max-w-7xl mx-auto"
+      className="relative section px-6 md:px-10 lg:px-16 max-w-7xl mx-auto"
     >
       <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
 
@@ -53,82 +53,71 @@ export default function About() {
             className="relative rounded-3xl overflow-hidden aspect-[4/5]"
             style={{ maxHeight: 560 }}
           >
-            <motion.div
-              className="absolute inset-0 flex items-center justify-center"
+            <motion.img
+              src="/gallery/about/sophia-portrait.jpg"
+              alt="Sophia, founder of Sophia's Clean"
+              className="absolute inset-0 w-full h-full object-cover"
               style={{
-                background: 'linear-gradient(135deg, var(--color-sage) 0%, var(--color-sage-dark) 100%)',
                 y: imgY,
+                objectPosition: 'center 25%',
+                filter: 'contrast(1.04) saturate(1.06)',
               }}
-            >
-              {/* CSS illustration of a clean, bright room */}
-              <svg width="220" height="220" viewBox="0 0 220 220" fill="none" opacity="0.85">
-                {/* Window */}
-                <rect x="40" y="30" width="140" height="100" rx="8" fill="white" fillOpacity="0.15"/>
-                <line x1="110" y1="30" x2="110" y2="130" stroke="white" strokeWidth="2" strokeOpacity="0.4"/>
-                <line x1="40"  y1="80" x2="180" y2="80"  stroke="white" strokeWidth="2" strokeOpacity="0.4"/>
-                {/* Sun */}
-                <circle cx="155" cy="55" r="14" fill="white" fillOpacity="0.5"/>
-                {/* Floor */}
-                <rect x="20" y="150" width="180" height="6" rx="3" fill="white" fillOpacity="0.25"/>
-                {/* Cleaning bucket */}
-                <rect x="80" y="155" width="60" height="40" rx="4" fill="white" fillOpacity="0.3"/>
-                <path d="M90 155 C90 140 130 140 130 155" stroke="white" strokeWidth="3" strokeLinecap="round" fill="none" strokeOpacity="0.4"/>
-                {/* Bubbles */}
-                <circle cx="60"  cy="140" r="6"   fill="white" fillOpacity="0.4"/>
-                <circle cx="160" cy="145" r="4.5" fill="white" fillOpacity="0.3"/>
-                <circle cx="150" cy="130" r="3"   fill="white" fillOpacity="0.25"/>
-              </svg>
+              loading="lazy"
+            />
 
-              {/* Sparkle overlay */}
-              {[...Array(6)].map((_, i) => (
-                <motion.div
-                  key={i}
-                  className="absolute w-1.5 h-1.5 rounded-full bg-white"
-                  style={{
-                    top:  `${20 + i * 13}%`,
-                    left: `${15 + (i % 3) * 30}%`,
-                  }}
-                  animate={{ opacity: [0, 1, 0], scale: [0.5, 1.5, 0.5] }}
-                  transition={{
-                    duration: 2.5,
-                    delay: i * 0.5,
-                    repeat: Infinity,
-                    ease: 'easeInOut',
-                  }}
-                />
-              ))}
-            </motion.div>
+            {/* Subtle bottom darken for badge legibility */}
+            <div
+              className="absolute inset-x-0 bottom-0 h-1/3 pointer-events-none"
+              style={{
+                background: 'linear-gradient(to top, rgba(26,8,18,0.35) 0%, transparent 100%)',
+              }}
+            />
+
+            {/* Sparkle overlay */}
+            {[...Array(6)].map((_, i) => (
+              <motion.div
+                key={i}
+                className="absolute w-1.5 h-1.5 rounded-full bg-white pointer-events-none"
+                style={{
+                  top:  `${20 + i * 13}%`,
+                  left: `${15 + (i % 3) * 30}%`,
+                  filter: 'drop-shadow(0 0 6px rgba(255,255,255,0.8))',
+                }}
+                animate={{ opacity: [0, 1, 0], scale: [0.5, 1.5, 0.5] }}
+                transition={{
+                  duration: 2.5,
+                  delay: i * 0.5,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                }}
+              />
+            ))}
           </div>
 
-          {/* Floating stat card */}
+          {/* Floating tagline card */}
           <motion.div
             className="absolute -right-6 bottom-10 rounded-2xl px-6 py-5 shadow-xl"
             style={{
               background: 'white',
               border: '1px solid var(--color-cream-border)',
-              minWidth: 180,
+              minWidth: 200,
             }}
             initial={{ opacity: 0, scale: 0.8, x: 20 }}
             animate={leftVisible ? { opacity: 1, scale: 1, x: 0 } : {}}
             transition={{ delay: 0.5, type: 'spring', stiffness: 100, damping: 16 }}
           >
-            <div className="text-3xl font-display font-bold" style={{ color: 'var(--color-sage)' }}>
-              98%
+            <div className="font-display italic text-xl" style={{ color: 'var(--color-sage)' }}>
+              Save time,
             </div>
-            <div className="text-sm font-medium mt-0.5" style={{ color: 'rgba(26,8,18,0.7)' }}>
-              Customer Satisfaction
+            <div className="font-display italic text-xl -mt-0.5" style={{ color: 'var(--color-sage)' }}>
+              enjoy life!
             </div>
-            <div className="flex gap-0.5 mt-2">
-              {[...Array(5)].map((_, i) => (
-                <svg key={i} width="12" height="12" viewBox="0 0 12 12">
-                  <polygon points="6,1 7.8,4.5 12,5.2 9,8 9.7,12.2 6,10.2 2.3,12.2 3,8 0,5.2 4.2,4.5"
-                    fill="var(--color-gold)" />
-                </svg>
-              ))}
+            <div className="text-[11px] mt-2 font-medium tracking-wide" style={{ color: 'rgba(26,8,18,0.55)' }}>
+              — Sophia's promise
             </div>
           </motion.div>
 
-          {/* Sophia badge */}
+          {/* Founder badge */}
           <motion.div
             className="absolute -left-4 top-8 rounded-2xl px-5 py-4 shadow-lg"
             style={{
@@ -139,9 +128,9 @@ export default function About() {
             animate={leftVisible ? { opacity: 1, scale: 1, x: 0 } : {}}
             transition={{ delay: 0.7, type: 'spring', stiffness: 100, damping: 16 }}
           >
-            <div className="text-sm font-semibold text-white">Founded by Sophia</div>
-            <div className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.5)' }}>
-              Cleaning since 2016
+            <div className="text-sm font-semibold text-white">Founder & Owner</div>
+            <div className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.55)' }}>
+              Cape Town
             </div>
           </motion.div>
         </motion.div>
@@ -176,9 +165,7 @@ export default function About() {
             className="text-base leading-relaxed mb-4"
             style={{ color: 'rgba(26,8,18,0.65)' }}
           >
-            Sophia started this business with a simple belief: a clean home is a calm mind.
-            After years of seeing families overwhelmed by mess and time pressure, she built
-            a team that treats every client's space like their own.
+            Sophia's Clean started with a single online promo and a simple belief: a clean home is a calm mind. What began with managing Airbnb properties grew into a true passion for creating spaces people feel comfortable and happy in.
           </motion.p>
 
           <motion.p
@@ -186,8 +173,7 @@ export default function About() {
             className="text-base leading-relaxed mb-10"
             style={{ color: 'rgba(26,8,18,0.65)' }}
           >
-            Today, we operate across Johannesburg and Pretoria with a hand-picked team
-            of trained, background-checked professionals who share her standards.
+            Today, we serve homes and businesses across Cape Town with a hand-picked team of trained professionals who share Sophia's standards — and treat every space like their own.
           </motion.p>
 
           {/* Pillars */}
@@ -223,7 +209,7 @@ export default function About() {
         </motion.div>
       </div>
 
-      {/* Stats strip */}
+      {/* Values strip */}
       <motion.div
         ref={statsRef}
         className="grid grid-cols-2 lg:grid-cols-4 gap-6 mt-20 pt-16"
@@ -232,11 +218,11 @@ export default function About() {
         initial="hidden"
         animate={statsVisible ? 'visible' : 'hidden'}
       >
-        {STATS.map(({ number, label }) => (
+        {VALUES.map(({ number, label }) => (
           <motion.div key={label} variants={staggerItem} className="text-center">
             <div
-              className="font-display font-bold mb-1"
-              style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', color: 'var(--color-sage)' }}
+              className="font-display font-semibold mb-1"
+              style={{ fontSize: 'clamp(1.4rem, 2.4vw, 1.9rem)', color: 'var(--color-sage)' }}
             >
               {number}
             </div>

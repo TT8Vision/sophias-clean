@@ -1,6 +1,14 @@
 import { useEffect } from 'react';
 import Lenis from '@studio-freight/lenis';
 
+// Module-level reference so other modules (e.g. route-change scroll reset)
+// can talk to the same instance without prop-drilling.
+let lenisInstance = null;
+
+export function getLenis() {
+  return lenisInstance;
+}
+
 // ─────────────────────────────────────────────────────────────
 // useLenis
 // Initialises Lenis smooth scroll and ties it to GSAP ticker
@@ -14,6 +22,7 @@ export function useLenis() {
       smoothWheel: true,
       wheelMultiplier: 0.8,   // slightly slower than default for luxury feel
     });
+    lenisInstance = lenis;
 
     function raf(time) {
       lenis.raf(time);
@@ -23,6 +32,7 @@ export function useLenis() {
 
     return () => {
       lenis.destroy();
+      lenisInstance = null;
     };
   }, []);
 }

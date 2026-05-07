@@ -13,5 +13,27 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+
+    <!-- BuildMyAgent.io — Sophia's Clean AI Assistant -->
+    <script
+      src="https://buildmyagent.io/widget/69c92e602563ef867ab677d2/widget-professional.js"
+      async
+    ></script>
+    <script>
+      (function () {
+        function bootAgent() {
+          if (window.AIChatWidget && typeof window.AIChatWidget.init === 'function') {
+            window.AIChatWidget.init();
+          } else {
+            setTimeout(bootAgent, 200);
+          }
+        }
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', bootAgent);
+        } else {
+          bootAgent();
+        }
+      })();
+    </script>
   </body>
 </html>

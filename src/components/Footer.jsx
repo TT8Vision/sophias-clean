@@ -1,5 +1,7 @@
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { Sparkles, MessageCircle } from 'lucide-react';
+import { openBookingChat } from '../lib/whatsapp';
 
 // Custom SVG social icons (Facebook & Instagram removed from lucide-react v0.400+)
 const FacebookIcon = ({ size = 18, color = 'white' }) => (
@@ -22,6 +24,18 @@ const LINKS = {
   Services: ['Regular House Cleaning', 'Deep Cleaning', 'Move In / Move Out', 'Commercial Cleaning', 'Carpet & Upholstery', 'Window Cleaning'],
   Company: ['About Sophia', 'Our Work', 'Eco Products', 'Book a Clean'],
   Areas: ['Table View', 'Cape Town CBD', 'Sea Point', 'Century City', 'Claremont', 'Stellenbosch'],
+};
+
+// Route map for footer items that point to real pages
+const LINK_ROUTES = {
+  'About Sophia': '/about',
+  'Our Work': '/work',
+  'Eco Products': '/products',
+};
+
+// Items that trigger an action instead of routing
+const LINK_ACTIONS = {
+  'Book a Clean': () => openBookingChat(),
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -107,18 +121,43 @@ export default function Footer() {
                 {heading}
               </h4>
               <ul className="space-y-2.5">
-                {items.map((item) => (
-                  <li key={item}>
-                    <motion.a
-                      href="#"
-                      className="text-sm no-underline"
-                      style={{ color: 'rgba(255,255,255,0.55)' }}
-                      whileHover={{ color: 'white', x: 2, transition: { type: 'spring', stiffness: 300, damping: 18 } }}
-                    >
-                      {item}
-                    </motion.a>
-                  </li>
-                ))}
+                {items.map((item) => {
+                  const route = LINK_ROUTES[item];
+                  const action = LINK_ACTIONS[item];
+                  const sharedClass = "text-sm no-underline";
+                  const sharedStyle = { color: 'rgba(255,255,255,0.55)' };
+                  const sharedHover = { color: 'white', x: 2, transition: { type: 'spring', stiffness: 300, damping: 18 } };
+                  return (
+                    <li key={item}>
+                      {route ? (
+                        <motion.span whileHover={sharedHover} style={sharedStyle} className={sharedClass}>
+                          <Link to={route} style={{ color: 'inherit', textDecoration: 'none' }}>
+                            {item}
+                          </Link>
+                        </motion.span>
+                      ) : action ? (
+                        <motion.button
+                          type="button"
+                          onClick={action}
+                          className={sharedClass}
+                          style={{ ...sharedStyle, background: 'none', border: 'none', padding: 0, cursor: 'pointer', font: 'inherit', textAlign: 'left' }}
+                          whileHover={sharedHover}
+                        >
+                          {item}
+                        </motion.button>
+                      ) : (
+                        <motion.a
+                          href="#"
+                          className={sharedClass}
+                          style={sharedStyle}
+                          whileHover={sharedHover}
+                        >
+                          {item}
+                        </motion.a>
+                      )}
+                    </li>
+                  );
+                })}
               </ul>
             </motion.div>
           ))}

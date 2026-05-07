@@ -3,8 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { ArrowRight, Star, CheckCircle2, Quote } from 'lucide-react';
 import MagneticButton from '../components/MagneticButton';
+import About from '../components/About';
 import { fadeUp, staggerContainer, staggerItem } from '../animations/variants';
 import { useScrollReveal } from '../hooks/useScrollReveal';
+import { openBookingChat } from '../lib/whatsapp';
 
 // ─── Services (from sophiasclean.co.za) ────────────────────────
 const SERVICES = [
@@ -185,7 +187,7 @@ export default function Home() {
             transition={{ delay: 0.7, type: 'spring', stiffness: 80, damping: 18 }}
           >
             <MagneticButton
-              onClick={() => navigate('/book')}
+              onClick={() => openBookingChat()}
               className="flex items-center justify-center gap-2 px-6 sm:px-8 py-3.5 sm:py-4 rounded-2xl text-white font-semibold text-sm sm:text-base w-full sm:w-auto"
               style={{
                 background: 'linear-gradient(135deg, var(--color-sage) 0%, var(--color-sage-dark) 100%)',
@@ -353,7 +355,7 @@ export default function Home() {
               <motion.button
                 key={s.label}
                 variants={staggerItem}
-                onClick={() => navigate('/book')}
+                onClick={() => openBookingChat(s.label)}
                 className="text-left p-5 rounded-2xl group"
                 style={{
                   background: 'white',
@@ -385,6 +387,13 @@ export default function Home() {
             ))}
           </div>
         </motion.div>
+      </section>
+
+      {/* ════════════════════════════════════════
+          ABOUT — Meet Sophia + trust pillars
+      ════════════════════════════════════════ */}
+      <section className="py-20 md:py-28" style={{ background: 'white' }}>
+        <About />
       </section>
 
       {/* ════════════════════════════════════════
@@ -527,7 +536,7 @@ export default function Home() {
             <em className="font-normal" style={{ opacity: 0.85 }}>Free quote, no commitment.</em>
           </h2>
           <MagneticButton
-            onClick={() => navigate('/book')}
+            onClick={() => openBookingChat()}
             className="inline-flex items-center gap-2 px-10 py-4 rounded-2xl font-bold text-base"
             style={{
               background: 'white',

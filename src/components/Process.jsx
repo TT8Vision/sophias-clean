@@ -46,7 +46,7 @@ export default function Process() {
   return (
     <section
       ref={sectionRef}
-      className="section px-6 md:px-10 lg:px-16 max-w-7xl mx-auto"
+      className="relative section px-6 md:px-10 lg:px-16 max-w-7xl mx-auto"
       style={{ background: 'var(--color-charcoal)', borderRadius: '2rem', margin: '0 1rem' }}
       id="results"
     >

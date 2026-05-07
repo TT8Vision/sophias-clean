@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, MapPin, Clock } from 'lucide-react';
 import MagneticButton from '../components/MagneticButton';
 import { staggerContainer, staggerItem } from '../animations/variants';
 import { useScrollReveal } from '../hooks/useScrollReveal';
+import { openBookingChat } from '../lib/whatsapp';
 
 // Only real job photos — no text graphics, no video thumbnails
 const JOBS = [
@@ -91,7 +91,6 @@ const JOBS = [
 ];
 
 export default function Work() {
-  const navigate = useNavigate();
   const { ref: gridRef, isInView: gridVisible } = useScrollReveal();
 
   return (
@@ -143,7 +142,7 @@ export default function Work() {
           Like what you see? Let's do the same for your space.
         </p>
         <MagneticButton
-          onClick={() => navigate('/book')}
+          onClick={() => openBookingChat()}
           className="inline-flex items-center gap-2 px-10 py-4 rounded-2xl text-white font-semibold"
           style={{
             background: 'linear-gradient(135deg, var(--color-sage), var(--color-sage-dark))',

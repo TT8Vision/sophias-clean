@@ -1,14 +1,17 @@
 import { useState, useEffect } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence, useScroll } from 'framer-motion';
-import { Menu, X, Sparkles } from 'lucide-react';
+import { Menu, X, Sparkles, ShoppingBag } from 'lucide-react';
 import MagneticButton from './MagneticButton';
+import { useCart } from '../lib/CartContext';
+import { openBookingChat } from '../lib/whatsapp';
 
 const NAV_LINKS = [
   { label: 'Home',     href: '/'         },
+  { label: 'About',    href: '/about'    },
   { label: 'Our Work', href: '/work'     },
   { label: 'Products', href: '/products' },
-  { label: 'Book',     href: '/book'     },
+  { label: 'Quote',    href: '/quote'    },
 ];
 
 export default function Navbar() {
@@ -16,7 +19,7 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const { scrollY } = useScroll();
   const location = useLocation();
-  const navigate = useNavigate();
+  const { count, openCart } = useCart();
 
   useEffect(() => {
     const unsub = scrollY.on('change', (v) => setScrolled(v > 60));
@@ -93,42 +96,81 @@ export default function Navbar() {
           })}
         </nav>
 
-        {/* CTA */}
-        <div className="hidden md:block">
-          <MagneticButton
-            onClick={() => navigate('/book')}
-            className="px-5 py-2.5 text-sm font-semibold rounded-full text-white"
-            style={{ background: 'var(--color-sage)' }}
+        {/* Right cluster: cart + CTA / hamburger */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          {/* Cart button — visible on all sizes */}
+          <motion.button
+            onClick={openCart}
+            className="relative w-10 h-10 rounded-full flex items-center justify-center"
+            style={{
+              background: 'rgba(194,24,91,0.08)',
+              border: '1px solid rgba(194,24,91,0.18)',
+              color: 'var(--color-sage)',
+              cursor: 'pointer',
+            }}
+            whileHover={{ scale: 1.05, background: 'rgba(194,24,91,0.14)' }}
+            whileTap={{ scale: 0.94 }}
+            aria-label={`Cart (${count} item${count === 1 ? '' : 's'})`}
           >
-            Book a Clean
-          </MagneticButton>
-        </div>
+            <ShoppingBag size={16} />
+            <AnimatePresence>
+              {count > 0 && (
+                <motion.span
+                  key="badge"
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0, opacity: 0 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 22 }}
+                  className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full flex items-center justify-center text-[10px] font-bold"
+                  style={{
+                    background: 'var(--color-sage)',
+                    color: 'white',
+                    boxShadow: '0 2px 6px rgba(194,24,91,0.4)',
+                  }}
+                >
+                  {count > 99 ? '99+' : count}
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </motion.button>
 
-        {/* Mobile hamburger */}
-        <button
-          onClick={() => setOpen((p) => !p)}
-          className="md:hidden p-2 rounded-lg"
-          style={{ color: 'var(--color-charcoal)', background: 'none', border: 'none' }}
-          aria-label="Toggle menu"
-        >
-          <AnimatePresence mode="wait">
-            {open ? (
-              <motion.span key="x"
-                initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }}
-                exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.18 }}
-              >
-                <X size={22} />
-              </motion.span>
-            ) : (
-              <motion.span key="menu"
-                initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }}
-                exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.18 }}
-              >
-                <Menu size={22} />
-              </motion.span>
-            )}
-          </AnimatePresence>
-        </button>
+          {/* Desktop CTA */}
+          <div className="hidden md:block">
+            <MagneticButton
+              onClick={() => openBookingChat()}
+              className="px-5 py-2.5 text-sm font-semibold rounded-full text-white"
+              style={{ background: 'var(--color-sage)' }}
+            >
+              Book a Clean
+            </MagneticButton>
+          </div>
+
+          {/* Mobile hamburger */}
+          <button
+            onClick={() => setOpen((p) => !p)}
+            className="md:hidden p-2 rounded-lg"
+            style={{ color: 'var(--color-charcoal)', background: 'none', border: 'none' }}
+            aria-label="Toggle menu"
+          >
+            <AnimatePresence mode="wait">
+              {open ? (
+                <motion.span key="x"
+                  initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }}
+                  exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.18 }}
+                >
+                  <X size={22} />
+                </motion.span>
+              ) : (
+                <motion.span key="menu"
+                  initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }}
+                  exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.18 }}
+                >
+                  <Menu size={22} />
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </button>
+        </div>
       </motion.header>
 
       {/* Mobile menu */}
@@ -168,14 +210,14 @@ export default function Navbar() {
               className="mt-8"
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.25 }}
             >
-              <Link
-                to="/book"
-                className="block w-full py-4 rounded-2xl text-white font-semibold text-lg text-center no-underline"
-                style={{ background: 'var(--color-sage)', textDecoration: 'none' }}
-                onClick={() => setOpen(false)}
+              <button
+                type="button"
+                className="block w-full py-4 rounded-2xl text-white font-semibold text-lg text-center"
+                style={{ background: 'var(--color-sage)', border: 'none', cursor: 'pointer' }}
+                onClick={() => { setOpen(false); openBookingChat(); }}
               >
                 Book a Clean
-              </Link>
+              </button>
             </motion.div>
           </motion.div>
         )}
