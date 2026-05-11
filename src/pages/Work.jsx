@@ -4,7 +4,7 @@ import { ArrowRight, MapPin, Clock } from 'lucide-react';
 import MagneticButton from '../components/MagneticButton';
 import { staggerContainer, staggerItem } from '../animations/variants';
 import { useScrollReveal } from '../hooks/useScrollReveal';
-import { openBookingChat } from '../lib/whatsapp';
+import { openQuoteForm } from '../lib/quoteForm';
 
 // Only real job photos — no text graphics, no video thumbnails
 const JOBS = [
@@ -142,7 +142,7 @@ export default function Work() {
           Like what you see? Let's do the same for your space.
         </p>
         <MagneticButton
-          onClick={() => openBookingChat()}
+          onClick={() => openQuoteForm()}
           className="inline-flex items-center gap-2 px-10 py-4 rounded-2xl text-white font-semibold"
           style={{
             background: 'linear-gradient(135deg, var(--color-sage), var(--color-sage-dark))',

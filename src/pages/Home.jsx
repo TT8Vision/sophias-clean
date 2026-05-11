@@ -4,9 +4,10 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { ArrowRight, Star, CheckCircle2, Quote } from 'lucide-react';
 import MagneticButton from '../components/MagneticButton';
 import About from '../components/About';
+import AIAssistantCTA from '../components/AIAssistantCTA';
 import { fadeUp, staggerContainer, staggerItem } from '../animations/variants';
 import { useScrollReveal } from '../hooks/useScrollReveal';
-import { openBookingChat } from '../lib/whatsapp';
+import { openQuoteForm } from '../lib/quoteForm';
 
 // ─── Services (from sophiasclean.co.za) ────────────────────────
 const SERVICES = [
@@ -186,17 +187,7 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7, type: 'spring', stiffness: 80, damping: 18 }}
           >
-            <MagneticButton
-              onClick={() => openBookingChat()}
-              className="flex items-center justify-center gap-2 px-6 sm:px-8 py-3.5 sm:py-4 rounded-2xl text-white font-semibold text-sm sm:text-base w-full sm:w-auto"
-              style={{
-                background: 'linear-gradient(135deg, var(--color-sage) 0%, var(--color-sage-dark) 100%)',
-                boxShadow: '0 8px 32px rgba(194,24,91,0.3)',
-              }}
-            >
-              Book a Clean
-              <ArrowRight size={16} />
-            </MagneticButton>
+            <AIAssistantCTA />
 
             <MagneticButton
               onClick={() => navigate('/work')}
@@ -218,7 +209,7 @@ export default function Home() {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.9 }}
           >
-            {['Plant-based eco products', 'Insured professional team', 'Free quote within 2 hrs'].map((t) => (
+            {['Plant-based eco products', 'Insured professional team'].map((t) => (
               <span
                 key={t}
                 className="flex items-center gap-1.5 text-xs sm:text-sm font-medium"
@@ -355,7 +346,7 @@ export default function Home() {
               <motion.button
                 key={s.label}
                 variants={staggerItem}
-                onClick={() => openBookingChat(s.label)}
+                onClick={() => openQuoteForm()}
                 className="text-left p-5 rounded-2xl group"
                 style={{
                   background: 'white',
@@ -536,7 +527,7 @@ export default function Home() {
             <em className="font-normal" style={{ opacity: 0.85 }}>Free quote, no commitment.</em>
           </h2>
           <MagneticButton
-            onClick={() => openBookingChat()}
+            onClick={() => openQuoteForm()}
             className="inline-flex items-center gap-2 px-10 py-4 rounded-2xl font-bold text-base"
             style={{
               background: 'white',

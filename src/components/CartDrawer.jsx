@@ -1,7 +1,8 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Minus, Plus, Trash2, MessageCircle, ShoppingBag } from 'lucide-react';
+import { X, Minus, Plus, Trash2, ExternalLink, ShoppingBag } from 'lucide-react';
 import { useEffect } from 'react';
-import { useCart, buildWhatsAppCheckoutMessage } from '../lib/CartContext';
+import { useCart } from '../lib/CartContext';
+import { openQuoteForm } from '../lib/quoteForm';
 import MagneticButton from './MagneticButton';
 
 export default function CartDrawer() {
@@ -17,9 +18,8 @@ export default function CartDrawer() {
   }, [isOpen]);
 
   const handleCheckout = () => {
-    const msg = buildWhatsAppCheckoutMessage(items, subtotal);
-    if (!msg) return;
-    window.open(`https://wa.me/27833999974?text=${encodeURIComponent(msg)}`, '_blank');
+    if (!items.length) return;
+    openQuoteForm();
   };
 
   return (
@@ -128,7 +128,7 @@ export default function CartDrawer() {
                   </span>
                 </div>
                 <p className="text-xs mb-4" style={{ color: 'rgba(26,8,18,0.5)' }}>
-                  Delivery quoted on WhatsApp. Free for Cape Town orders over R500.
+                  Submit the form to confirm your order. Free delivery in Cape Town over R500.
                 </p>
 
                 <MagneticButton
@@ -140,8 +140,8 @@ export default function CartDrawer() {
                     boxShadow: '0 8px 24px rgba(194,24,91,0.3)',
                   }}
                 >
-                  <MessageCircle size={15} />
-                  Checkout via WhatsApp
+                  <ExternalLink size={15} />
+                  Submit Order via Form
                 </MagneticButton>
 
                 <button
@@ -277,7 +277,7 @@ function EmptyState({ onClose }) {
         Your cart's empty
       </h3>
       <p className="text-sm leading-relaxed max-w-xs mb-6" style={{ color: 'rgba(26,8,18,0.55)' }}>
-        Add a few Astonish products and check out via WhatsApp.
+        Add a few Astonish products and submit your order via our quick form.
       </p>
       <button
         onClick={onClose}

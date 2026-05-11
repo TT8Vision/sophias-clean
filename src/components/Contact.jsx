@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Phone, Mail, MapPin, MessageCircle, CheckCircle2, Send } from 'lucide-react';
+import { Phone, Mail, MapPin, CheckCircle2, Send } from 'lucide-react';
 import { useScrollReveal } from '../hooks/useScrollReveal';
 import { staggerContainer, staggerItem, fadeUp, slideLeft, slideRight } from '../animations/variants';
 import MagneticButton from './MagneticButton';
@@ -86,13 +86,12 @@ export default function Contact() {
             style={{ color: 'rgba(26,8,18,0.6)' }}
           >
             Send us a message and we'll get back to you within 2 hours.
-            Or reach us directly on WhatsApp for instant booking.
+            Or fill out our quick quote form for an instant booking.
           </motion.p>
 
           {/* Contact info cards */}
           <motion.div className="space-y-4" variants={staggerContainer}>
             {[
-              { icon: MessageCircle, label: 'WhatsApp', value: '+27 79 123 4567', href: 'https://wa.me/27791234567', color: '#25D366' },
               { icon: Phone,         label: 'Call Us',  value: '+27 79 123 4567', href: 'tel:+27791234567',         color: 'var(--color-sage)' },
               { icon: Mail,          label: 'Email',    value: 'hello@sophiasclean.co.za', href: 'mailto:hello@sophiasclean.co.za', color: 'var(--color-gold)' },
               { icon: MapPin,        label: 'Areas',    value: 'Johannesburg · Pretoria · Midrand', href: null, color: '#e05c5c' },
@@ -174,7 +173,7 @@ export default function Contact() {
                     Message Sent!
                   </h3>
                   <p className="text-sm max-w-xs" style={{ color: 'rgba(26,8,18,0.6)' }}>
-                    Sophia's team will be in touch within 2 hours. Check your inbox or WhatsApp.
+                    Sophia's team will be in touch within 2 hours. Check your inbox.
                   </p>
                   <button
                     onClick={() => { setSent(false); setForm({ name: '', email: '', phone: '', service: '', message: '' }); }}
@@ -247,7 +246,7 @@ export default function Contact() {
                   {/* Phone */}
                   <div>
                     <label className="text-xs font-semibold mb-1.5 block" style={{ color: 'rgba(26,8,18,0.6)' }}>
-                      Phone / WhatsApp
+                      Phone Number
                     </label>
                     <input
                       placeholder="+27 79 000 0000"

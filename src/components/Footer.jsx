@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Sparkles, MessageCircle } from 'lucide-react';
-import { openBookingChat } from '../lib/whatsapp';
+import { Sparkles } from 'lucide-react';
+import { openQuoteForm } from '../lib/quoteForm';
 
 // Custom SVG social icons (Facebook & Instagram removed from lucide-react v0.400+)
 const FacebookIcon = ({ size = 18, color = 'white' }) => (
@@ -35,7 +35,7 @@ const LINK_ROUTES = {
 
 // Items that trigger an action instead of routing
 const LINK_ACTIONS = {
-  'Book a Clean': () => openBookingChat(),
+  'Book a Clean': () => openQuoteForm(),
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -89,7 +89,6 @@ export default function Footer() {
               {[
                 { icon: FacebookIcon,   href: 'https://facebook.com/sophiasclean',          label: 'Facebook' },
                 { icon: InstagramIcon,  href: 'https://instagram.com/sophiasclean_',        label: 'Instagram' },
-                { icon: MessageCircle,  href: 'https://wa.me/27833999974',                  label: 'WhatsApp' },
               ].map(({ icon: Icon, href, label }) => (
                 <motion.a
                   key={label}

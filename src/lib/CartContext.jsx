@@ -104,18 +104,3 @@ export function useCart() {
   return ctx;
 }
 
-export function buildWhatsAppCheckoutMessage(items, subtotal) {
-  if (!items.length) return '';
-  const lines = items.map(
-    (i) => `• ${i.qty}× ${i.name} — R${(parseFloat(i.price) * i.qty).toFixed(2)}`,
-  );
-  return [
-    "Hi Sophia's Clean! I'd like to order the following Astonish products:",
-    '',
-    ...lines,
-    '',
-    `Subtotal: R${subtotal.toFixed(2)}`,
-    '',
-    'Please arrange delivery in Cape Town. Thanks!',
-  ].join('\n');
-}

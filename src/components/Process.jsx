@@ -9,7 +9,7 @@ const STEPS = [
     icon: Phone,
     number: '01',
     title: 'Get in Touch',
-    desc: 'WhatsApp, call, or fill our form. We\'ll respond within 2 hours and discuss your needs.',
+    desc: 'Fill our quote form or give us a call. We\'ll respond within 2 hours and discuss your needs.',
   },
   {
     icon: CalendarCheck,

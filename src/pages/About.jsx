@@ -1,9 +1,15 @@
 import { motion } from 'framer-motion';
-import { ArrowRight, Sparkles, Quote } from 'lucide-react';
+import { ExternalLink, Sparkles, Quote } from 'lucide-react';
 import MagneticButton from '../components/MagneticButton';
 import { fadeUp, staggerContainer, staggerItem } from '../animations/variants';
 import { useScrollReveal } from '../hooks/useScrollReveal';
-import { openBookingChat } from '../lib/whatsapp';
+
+const FORM_URL =
+  'https://docs.google.com/forms/d/e/1FAIpQLSfRG8sAAw50nBfMs4c6m-2libX88m2oNaz5SnyjK06vetvIEw/viewform';
+
+const openForm = () => {
+  window.open(FORM_URL, '_blank', 'noopener,noreferrer');
+};
 
 // Origin story content sourced verbatim (with light formatting) from
 // https://www.sophiasclean.co.za/about
@@ -86,7 +92,7 @@ export default function AboutPage() {
                 className="flex flex-col sm:flex-row gap-3"
               >
                 <MagneticButton
-                  onClick={() => openBookingChat()}
+                  onClick={openForm}
                   className="flex items-center justify-center gap-2 px-6 sm:px-7 py-3.5 rounded-2xl text-white font-semibold text-sm sm:text-base"
                   style={{
                     background:
@@ -94,8 +100,8 @@ export default function AboutPage() {
                     boxShadow: '0 8px 32px rgba(194,24,91,0.3)',
                   }}
                 >
-                  Book a Clean
-                  <ArrowRight size={16} />
+                  Get a Free Quote
+                  <ExternalLink size={16} />
                 </MagneticButton>
               </motion.div>
             </motion.div>
@@ -132,10 +138,11 @@ export default function AboutPage() {
                   }}
                 />
                 <div
-                  className="absolute bottom-6 left-6 inline-flex items-center gap-2 px-3 py-1.5 rounded-full"
+                  className="absolute top-6 left-6 inline-flex items-center gap-2 px-3 py-1.5 rounded-full"
                   style={{
                     background: 'rgba(255,255,255,0.92)',
                     backdropFilter: 'blur(10px)',
+                    boxShadow: '0 4px 16px rgba(26,8,18,0.12)',
                   }}
                 >
                   <span
@@ -152,24 +159,28 @@ export default function AboutPage() {
               </div>
 
               <motion.div
-                className="hidden sm:block absolute -bottom-6 -left-6 rounded-2xl px-5 py-4 shadow-xl"
+                className="hidden sm:flex items-center gap-3 mt-6 px-5 py-3 rounded-2xl shadow-md w-fit"
                 style={{
                   background: 'white',
                   border: '1px solid var(--color-cream-border)',
                 }}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.7, type: 'spring', stiffness: 100, damping: 16 }}
               >
                 <div
-                  className="font-display italic text-lg"
+                  className="font-display italic text-lg leading-none"
                   style={{ color: 'var(--color-sage)' }}
                 >
                   — Sophia
                 </div>
                 <div
-                  className="text-xs mt-0.5 font-medium"
-                  style={{ color: 'rgba(26,8,18,0.55)' }}
+                  className="w-px h-5"
+                  style={{ background: 'var(--color-cream-border)' }}
+                />
+                <div
+                  className="text-xs font-medium"
+                  style={{ color: 'rgba(26,8,18,0.6)' }}
                 >
                   Cape Town
                 </div>
@@ -419,7 +430,7 @@ export default function AboutPage() {
             </em>
           </h2>
           <MagneticButton
-            onClick={() => openBookingChat()}
+            onClick={openForm}
             className="inline-flex items-center gap-2 px-10 py-4 rounded-2xl font-bold text-base"
             style={{
               background: 'white',
@@ -427,8 +438,8 @@ export default function AboutPage() {
               boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
             }}
           >
-            Book a Clean
-            <ArrowRight size={16} />
+            Get a Free Quote
+            <ExternalLink size={16} />
           </MagneticButton>
         </motion.div>
       </section>

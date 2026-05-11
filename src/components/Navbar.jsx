@@ -4,7 +4,7 @@ import { motion, AnimatePresence, useScroll } from 'framer-motion';
 import { Menu, X, Sparkles, ShoppingBag } from 'lucide-react';
 import MagneticButton from './MagneticButton';
 import { useCart } from '../lib/CartContext';
-import { openBookingChat } from '../lib/whatsapp';
+import { openQuoteForm } from '../lib/quoteForm';
 
 const NAV_LINKS = [
   { label: 'Home',     href: '/'         },
@@ -137,7 +137,7 @@ export default function Navbar() {
           {/* Desktop CTA */}
           <div className="hidden md:block">
             <MagneticButton
-              onClick={() => openBookingChat()}
+              onClick={() => openQuoteForm()}
               className="px-5 py-2.5 text-sm font-semibold rounded-full text-white"
               style={{ background: 'var(--color-sage)' }}
             >
@@ -214,7 +214,7 @@ export default function Navbar() {
                 type="button"
                 className="block w-full py-4 rounded-2xl text-white font-semibold text-lg text-center"
                 style={{ background: 'var(--color-sage)', border: 'none', cursor: 'pointer' }}
-                onClick={() => { setOpen(false); openBookingChat(); }}
+                onClick={() => { setOpen(false); openQuoteForm(); }}
               >
                 Book a Clean
               </button>

@@ -1,9 +1,10 @@
 import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Leaf, Search, MessageCircle, Plus, Check, Sparkles, ShoppingBag } from 'lucide-react';
+import { ArrowRight, Leaf, Search, ExternalLink, Plus, Check, Sparkles, ShoppingBag } from 'lucide-react';
 import MagneticButton from '../components/MagneticButton';
 import { staggerContainer, staggerItem } from '../animations/variants';
 import { useCart } from '../lib/CartContext';
+import { openQuoteForm } from '../lib/quoteForm';
 
 // ─── Real product catalogue from sophiasclean.co.za/products ────
 // Astonish — plant-based, cruelty-free, no harmful chemicals
@@ -184,7 +185,7 @@ export default function Products() {
           </motion.p>
         )}
 
-        {/* ── Order via WhatsApp banner ── */}
+        {/* ── Order via form banner ── */}
         <motion.div
           className="mt-16 rounded-3xl p-10 md:p-14 text-center relative overflow-hidden"
           style={{
@@ -206,18 +207,18 @@ export default function Products() {
           />
           <Leaf size={32} color="white" style={{ margin: '0 auto 1rem', opacity: 0.9 }} />
           <h2 className="font-display font-bold text-white mb-3" style={{ fontSize: 'clamp(1.5rem, 3vw, 2.2rem)' }}>
-            Order any product via WhatsApp
+            Order any product via our form
           </h2>
           <p className="text-white/70 text-sm max-w-md mx-auto mb-7">
-            Message us with the product names and we'll arrange delivery in Cape Town or include them in your next clean.
+            Tell us which products you'd like and we'll arrange delivery in Cape Town or include them in your next clean.
           </p>
           <MagneticButton
-            onClick={() => window.open('https://wa.me/27833999974?text=' + encodeURIComponent("Hi Sophia's Clean, I'd like to order some Astonish products."), '_blank')}
+            onClick={openQuoteForm}
             className="inline-flex items-center gap-2 px-8 py-3.5 rounded-2xl font-bold text-sm"
             style={{ background: 'white', color: 'var(--color-sage)', boxShadow: '0 8px 32px rgba(0,0,0,0.15)' }}
           >
-            <MessageCircle size={15} />
-            Order on WhatsApp
+            <ExternalLink size={15} />
+            Order via Form
             <ArrowRight size={14} />
           </MagneticButton>
         </motion.div>

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageCircle, Phone, Mail, MapPin, CheckCircle2, Send, Star } from 'lucide-react';
+import { Phone, Mail, MapPin, CheckCircle2, Send, Star } from 'lucide-react';
 import MagneticButton from '../components/MagneticButton';
 import { staggerContainer, staggerItem, fadeUp } from '../animations/variants';
 
@@ -122,7 +122,6 @@ export default function Book() {
             </motion.div>
 
             {[
-              { icon: MessageCircle, label: 'WhatsApp',       value: '083 399 9974',               href: 'https://wa.me/27833999974',              color: '#25D366' },
               { icon: Phone,         label: 'Call Us',        value: '083 399 9974',               href: 'tel:+27833999974',                       color: 'var(--color-sage)' },
               { icon: Mail,          label: 'Email',          value: 'info@sophiasclean.co.za',    href: 'mailto:info@sophiasclean.co.za',         color: 'var(--color-gold)' },
               { icon: MapPin,        label: 'Based in',       value: 'Raats Drive, Table View · CPT 7441', href: null,                              color: '#e05c5c' },
@@ -268,7 +267,7 @@ export default function Book() {
                     </div>
 
                     <div>
-                      <label className="text-xs font-semibold mb-1.5 block" style={{ color: 'rgba(26,8,18,0.55)' }}>Phone / WhatsApp</label>
+                      <label className="text-xs font-semibold mb-1.5 block" style={{ color: 'rgba(26,8,18,0.55)' }}>Phone Number</label>
                       <input
                         placeholder="+27 79 000 0000"
                         value={form.phone}
