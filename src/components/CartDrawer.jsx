@@ -8,7 +8,7 @@ import MagneticButton from './MagneticButton';
 const SOPHIA_WHATSAPP = '27833999974';
 
 export default function CartDrawer() {
-  const { items, isOpen, count, subtotal, updateQty, removeItem, clear, closeCart } = useCart();
+  const { items, isOpen, count, subtotal, updateQty, removeItem, clear, closeCart, openCart } = useCart();
   const [cardStatus, setCardStatus] = useState({ state: 'idle', message: '' });
 
   // Lock body scroll while drawer is open
@@ -28,21 +28,38 @@ export default function CartDrawer() {
 
   const handleCardCheckout = async () => {
     if (!items.length || cardStatus.state === 'processing') return;
+
+    // Hide the cart drawer so the Yoco popup gets the full viewport without
+    // being layered behind the drawer's blurred backdrop. We reopen the cart
+    // with the result after the popup resolves.
+    closeCart();
     setCardStatus({ state: 'opening', message: '' });
+
     try {
       const amountInCents = Math.round(subtotal * 100);
       const desc = `Sophia's Clean order — ${items.length} item${items.length === 1 ? '' : 's'}`;
       const result = await payWithCard({ amountInCents, description: desc });
-      if (!result || result.error) {
-        setCardStatus({ state: 'error', message: result?.error?.message || 'Card payment was cancelled.' });
+
+      if (!result) {
+        // User cancelled the popup
+        setCardStatus({ state: 'idle', message: '' });
+        openCart();
         return;
       }
+      if (result.error) {
+        setCardStatus({ state: 'error', message: result.error.message || 'Card payment failed.' });
+        openCart();
+        return;
+      }
+
       setCardStatus({ state: 'processing', message: 'Confirming payment…' });
+      openCart();
       await chargeOnServer({ token: result.id, amountInCents });
       setCardStatus({ state: 'success', message: 'Payment received. We\'ll be in touch with delivery details.' });
       clear();
     } catch (e) {
       setCardStatus({ state: 'error', message: e.message || 'We couldn\'t complete the card payment. Try WhatsApp instead.' });
+      openCart();
     }
   };
 
