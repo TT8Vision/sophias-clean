@@ -2,7 +2,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Minus, Plus, Trash2, MessageCircle, CreditCard, CheckCircle2, ShoppingBag, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useCart, buildCheckoutMessage } from '../lib/CartContext';
-import { payWithCard, chargeOnServer } from '../lib/yoco';
+import { payWithCard, chargeOnServer, preloadYocoSdk } from '../lib/yoco';
 import MagneticButton from './MagneticButton';
 
 const SOPHIA_WHATSAPP = '27833999974';
@@ -16,6 +16,9 @@ export default function CartDrawer() {
     if (isOpen) {
       const prev = document.body.style.overflow;
       document.body.style.overflow = 'hidden';
+      // Preload the Yoco SDK in the background so the card popup appears
+      // instantly when the user clicks 'Pay with Card'.
+      preloadYocoSdk();
       return () => { document.body.style.overflow = prev; };
     }
   }, [isOpen]);
@@ -27,17 +30,22 @@ export default function CartDrawer() {
   };
 
   const handleCardCheckout = async () => {
-    if (!items.length || cardStatus.state === 'processing') return;
+    if (!items.length || cardStatus.state === 'processing' || cardStatus.state === 'opening') return;
 
-    // Hide the cart drawer so the Yoco popup gets the full viewport without
-    // being layered behind the drawer's blurred backdrop. We reopen the cart
-    // with the result after the popup resolves.
-    closeCart();
+    // Show the loading state on the button (cart stays open) while we make
+    // sure the Yoco SDK is ready, so the user never sees a blank moment.
     setCardStatus({ state: 'opening', message: '' });
+    await preloadYocoSdk();
+
+    const amountInCents = Math.round(subtotal * 100);
+    const desc = `Sophia's Clean order — ${items.length} item${items.length === 1 ? '' : 's'}`;
+
+    // Close the cart and open the Yoco popup at the same instant. The SDK is
+    // already loaded so showPopup injects its overlay synchronously, meaning
+    // the user perceives one smooth swap: cart slides out, card form fades in.
+    closeCart();
 
     try {
-      const amountInCents = Math.round(subtotal * 100);
-      const desc = `Sophia's Clean order — ${items.length} item${items.length === 1 ? '' : 's'}`;
       const result = await payWithCard({ amountInCents, description: desc });
 
       if (!result) {

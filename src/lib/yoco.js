@@ -19,6 +19,10 @@ function loadSdk() {
   return sdkPromise;
 }
 
+export function preloadYocoSdk() {
+  return loadSdk().catch(() => null);
+}
+
 export async function payWithCard({ amountInCents, description = "Sophia's Clean order" }) {
   const Yoco = await loadSdk();
   return new Promise((resolve) => {
