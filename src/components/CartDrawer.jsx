@@ -1,12 +1,15 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Minus, Plus, Trash2, ExternalLink, ShoppingBag } from 'lucide-react';
-import { useEffect } from 'react';
-import { useCart } from '../lib/CartContext';
-import { openQuoteForm } from '../lib/quoteForm';
+import { X, Minus, Plus, Trash2, MessageCircle, CreditCard, CheckCircle2, ShoppingBag, Loader2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useCart, buildCheckoutMessage } from '../lib/CartContext';
+import { payWithCard, chargeOnServer } from '../lib/yoco';
 import MagneticButton from './MagneticButton';
+
+const SOPHIA_WHATSAPP = '27833999974';
 
 export default function CartDrawer() {
   const { items, isOpen, count, subtotal, updateQty, removeItem, clear, closeCart } = useCart();
+  const [cardStatus, setCardStatus] = useState({ state: 'idle', message: '' });
 
   // Lock body scroll while drawer is open
   useEffect(() => {
@@ -17,9 +20,30 @@ export default function CartDrawer() {
     }
   }, [isOpen]);
 
-  const handleCheckout = () => {
+  const handleWhatsAppCheckout = () => {
     if (!items.length) return;
-    openQuoteForm();
+    const msg = buildCheckoutMessage(items, subtotal);
+    window.open(`https://wa.me/${SOPHIA_WHATSAPP}?text=${encodeURIComponent(msg)}`, '_blank', 'noopener,noreferrer');
+  };
+
+  const handleCardCheckout = async () => {
+    if (!items.length || cardStatus.state === 'processing') return;
+    setCardStatus({ state: 'opening', message: '' });
+    try {
+      const amountInCents = Math.round(subtotal * 100);
+      const desc = `Sophia's Clean order — ${items.length} item${items.length === 1 ? '' : 's'}`;
+      const result = await payWithCard({ amountInCents, description: desc });
+      if (!result || result.error) {
+        setCardStatus({ state: 'error', message: result?.error?.message || 'Card payment was cancelled.' });
+        return;
+      }
+      setCardStatus({ state: 'processing', message: 'Confirming payment…' });
+      await chargeOnServer({ token: result.id, amountInCents });
+      setCardStatus({ state: 'success', message: 'Payment received. We\'ll be in touch with delivery details.' });
+      clear();
+    } catch (e) {
+      setCardStatus({ state: 'error', message: e.message || 'We couldn\'t complete the card payment. Try WhatsApp instead.' });
+    }
   };
 
   return (
@@ -128,21 +152,52 @@ export default function CartDrawer() {
                   </span>
                 </div>
                 <p className="text-xs mb-4" style={{ color: 'rgba(26,8,18,0.5)' }}>
-                  Submit the form to confirm your order. Free delivery in Cape Town over R500.
+                  Free delivery in Cape Town for orders over R1000.
                 </p>
 
-                <MagneticButton
-                  onClick={handleCheckout}
-                  className="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl text-white font-bold text-sm"
-                  style={{
-                    background:
-                      'linear-gradient(135deg, var(--color-sage) 0%, var(--color-sage-dark) 100%)',
-                    boxShadow: '0 8px 24px rgba(194,24,91,0.3)',
-                  }}
-                >
-                  <ExternalLink size={15} />
-                  Submit Order via Form
-                </MagneticButton>
+                <CheckoutStatus status={cardStatus} onReset={() => setCardStatus({ state: 'idle', message: '' })} />
+
+                {cardStatus.state !== 'success' && (
+                  <div className="space-y-2.5">
+                    <MagneticButton
+                      onClick={handleCardCheckout}
+                      className="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl text-white font-bold text-sm"
+                      style={{
+                        background:
+                          'linear-gradient(135deg, var(--color-sage) 0%, var(--color-sage-dark) 100%)',
+                        boxShadow: '0 8px 24px rgba(194,24,91,0.3)',
+                        opacity: cardStatus.state === 'opening' || cardStatus.state === 'processing' ? 0.7 : 1,
+                      }}
+                      disabled={cardStatus.state === 'opening' || cardStatus.state === 'processing'}
+                    >
+                      {cardStatus.state === 'opening' || cardStatus.state === 'processing' ? (
+                        <>
+                          <Loader2 size={15} className="animate-spin" />
+                          {cardStatus.state === 'processing' ? 'Confirming…' : 'Opening card…'}
+                        </>
+                      ) : (
+                        <>
+                          <CreditCard size={15} />
+                          Pay with Card
+                        </>
+                      )}
+                    </MagneticButton>
+
+                    <button
+                      onClick={handleWhatsAppCheckout}
+                      className="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl font-semibold text-sm"
+                      style={{
+                        background: 'white',
+                        border: '1.5px solid rgba(37, 211, 102, 0.4)',
+                        color: '#1faa55',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <MessageCircle size={15} />
+                      Order via WhatsApp
+                    </button>
+                  </div>
+                )}
 
                 <button
                   onClick={clear}
@@ -277,7 +332,7 @@ function EmptyState({ onClose }) {
         Your cart's empty
       </h3>
       <p className="text-sm leading-relaxed max-w-xs mb-6" style={{ color: 'rgba(26,8,18,0.55)' }}>
-        Add a few Astonish products and submit your order via our quick form.
+        Add a few Astonish products and check out with card or WhatsApp.
       </p>
       <button
         onClick={onClose}
@@ -292,5 +347,53 @@ function EmptyState({ onClose }) {
         Browse products
       </button>
     </div>
+  );
+}
+
+function CheckoutStatus({ status, onReset }) {
+  if (status.state === 'idle' || status.state === 'opening' || status.state === 'processing') {
+    return null;
+  }
+  const isSuccess = status.state === 'success';
+  return (
+    <motion.div
+      key={status.state}
+      initial={{ opacity: 0, y: -6 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="mb-3 p-3 rounded-xl flex items-start gap-2.5"
+      style={{
+        background: isSuccess ? 'rgba(34,197,94,0.08)' : 'rgba(220,38,38,0.06)',
+        border: `1px solid ${isSuccess ? 'rgba(34,197,94,0.25)' : 'rgba(220,38,38,0.18)'}`,
+      }}
+    >
+      <CheckCircle2
+        size={16}
+        style={{
+          color: isSuccess ? '#16a34a' : '#dc2626',
+          flexShrink: 0,
+          marginTop: 1,
+        }}
+      />
+      <div className="flex-1">
+        <p
+          className="text-xs font-semibold mb-0.5"
+          style={{ color: isSuccess ? '#15803d' : '#b91c1c' }}
+        >
+          {isSuccess ? 'Order confirmed' : 'Payment didn\'t go through'}
+        </p>
+        <p className="text-xs leading-snug" style={{ color: 'rgba(26,8,18,0.7)' }}>
+          {status.message}
+        </p>
+      </div>
+      {!isSuccess && (
+        <button
+          onClick={onReset}
+          className="text-[11px] font-semibold"
+          style={{ background: 'none', border: 'none', color: '#b91c1c', cursor: 'pointer' }}
+        >
+          Dismiss
+        </button>
+      )}
+    </motion.div>
   );
 }
