@@ -287,7 +287,7 @@ export default function Home() {
 
           {/* Floating rating chip */}
           <motion.div
-            className="absolute top-10 right-10 flex items-center gap-2 px-4 py-2.5 rounded-2xl z-10"
+            className="absolute top-24 right-10 flex items-center gap-2 px-4 py-2.5 rounded-2xl z-10"
             style={{
               background: 'rgba(255,255,255,0.95)',
               boxShadow: '0 12px 40px rgba(0,0,0,0.18)',
